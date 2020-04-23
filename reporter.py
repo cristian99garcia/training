@@ -12,7 +12,7 @@
 import json
 import logging
 
-from gi.repository import GConf
+
 from gi.repository import Gio
 from gi.repository import GObject
 from gi.repository import Soup
@@ -57,15 +57,15 @@ def _extract_tasks(data):
 
 class Reporter(GObject.GObject):
 
-    URL = '/desktop/sugar/services/training/url'
-    API_KEY = '/desktop/sugar/services/training/api_key'
+    URL = '/training/url'
+    API_KEY = 'training/api_key'
     TYPE = 'application/json'
 
     def __init__(self, activity):
         GObject.GObject.__init__(self)
-        client = GConf.Client.get_default()
-        self._url = client.get_string(self.URL)
-        self._api_key = client.get_string(self.API_KEY)
+        settings = Gio.Settings('org.sugarlabs.services') 
+        self._url = settings.get_string(self.URL)
+        self._api_key = settings.get_string(self.API_KEY)
         self._activity = activity
 
     def report(self, tasks_data_list):

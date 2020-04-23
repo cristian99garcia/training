@@ -11,7 +11,7 @@
 
 import json
 
-from gi.repository import GConf
+from gi.repository import Gio 
 from gi.repository import Soup
 
 
@@ -21,12 +21,12 @@ class ZendeskError(Exception):
 
 class FieldHelper(object):
 
-    IDS = '/desktop/sugar/services/zendesk/fields'
+    IDS = 'zendesk/fields'
 
     def __init__(self):
         # FIXME #3926 GConf get_list is missing
-        client = GConf.Client.get_default()
-        raw = client.get(self.IDS)
+        settings = Gio.Settings('org.sugarlabs.services') 
+        raw = settings.get(self.IDS)
         if not raw:
             raise ZendeskError('soupdesk is missing fields')
         self._ids = [int(e.get_string()) for e in raw.get_list()]
@@ -40,13 +40,14 @@ class FieldHelper(object):
 
 class Request(object):
 
-    URL = '/desktop/sugar/services/zendesk/url'
-    TOKEN = '/desktop/sugar/services/zendesk/token'
+    URL = 'zendesk/url'
+    TOKEN = 'zendesk/token'
 
     def __init__(self):
-        client = GConf.Client.get_default()
-        self._url = client.get_string(self.URL)
-        self._token = client.get_string(self.TOKEN)
+        settings = Gio.Settings('org.sugarlabs.services') 
+        self._url = settings.get_string(self.URL)
+
+        self._token = settings.get_string(self.TOKEN)
         self._data = None
 
         if not self._url or not self._token:
