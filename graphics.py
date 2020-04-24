@@ -14,7 +14,7 @@ from gettext import gettext as _
 
 from gi.repository import Gtk
 from gi.repository import Gdk
-from gi.repository import WebKit
+from gi.repository import WebKit2 
 
 from sugar3.graphics import style
 from sugar3.graphics.icon import Icon
@@ -28,7 +28,7 @@ FONT_SIZES = ['xx-small', 'x-small', 'small', 'medium', 'large', 'large',
               'x-large', 'x-large', 'x-large', 'xx-large', 'xx-large',
               'xx-large']
 
-
+ZOOM_ORIGINAL = style.zoom(100*100 / 72) / 100.0
 class Graphics(Gtk.Alignment):
     ''' An aligned grid in a scrolling window '''
 
@@ -166,11 +166,11 @@ class Graphics(Gtk.Alignment):
         return button
 
     def add_uri(self, uri, height=610):
-        self._web_view = WebKit.WebView()
+        self._web_view = WebKit2.WebView()
         width = Gdk.Screen.width() - style.GRID_CELL_SIZE
         height = int(height * Gdk.Screen.height() / 900.)
         self._web_view.set_size_request(width, height)
-        self._web_view.set_full_content_zoom(True)
+        self._web_view.set_zoom_level(ZOOM_ORIGINAL)
         self._web_view.load_uri(uri)
         self._attach(self._web_view)
         self._web_view.show()

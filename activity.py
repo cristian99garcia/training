@@ -15,7 +15,7 @@ import os
 import json
 import subprocess
 from time import sleep
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from gettext import gettext as _
 
 from gi.repository import Gio
@@ -441,7 +441,7 @@ class TrainingActivity(activity.Activity):
                 fd = open(usb_data_path, 'w')
                 fd.write(json_data)
                 fd.close()
-            except Exception, e:
+            except Exception as e:
                 write_failed = True
                 _logger.error('Could not write to USB %s: %s' %
                               (usb_data_path, e))
@@ -614,7 +614,7 @@ class TrainingActivity(activity.Activity):
                 fd = open(usb_data_path, 'w')
                 fd.write(json_data)
                 fd.close()
-            except Exception, e:
+            except Exception as e:
                 self._fatal_error = True
                 _logger.error('Fatal error: could not write to %s: %s' %
                               (usb_data_path, e))

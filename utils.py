@@ -15,9 +15,9 @@ import json
 import subprocess
 import dbus
 import stat
-import statvfs
+
 import glob
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from random import uniform
 import tempfile
 import cairo
@@ -30,7 +30,7 @@ from gi.repository import Gio
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GLib
-from gi.repository import GConf
+from gi.repository import Gio 
 from gi.repository import GObject
 
 from sugar3 import env
@@ -128,12 +128,12 @@ def reboot():
         bus = dbus.SessionBus()
         try:
             proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
-        except Exception, e:
+        except Exception as e:
             _logger.error('ERROR rebooting Sugar (proxy): %s' % e)
             _vte_reboot()
     try:
         dbus.Interface(proxy, _DBUS_SERVICE).Reboot()
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR rebooting Sugar: %s' % e)
         _vte_reboot()
 
@@ -164,7 +164,7 @@ def check_volume_suffix(volume_file):
         return TRAINING_DATA % volume_file[-13:]
     elif volume_file.endswith('.bin'):  # See SEP-33
         new_volume_file = volume_file[:-4] + TRAINING_SUFFIX
-        print new_volume_file
+        print(new_volume_file)
         os.rename(volume_file, new_volume_file)
         _logger.debug('return %s' % (TRAINING_DATA % new_volume_file[-13:]))
         return TRAINING_DATA % new_volume_file[-13:]
@@ -215,7 +215,7 @@ def get_email_from_training_data(path):
         fd = open(path, 'r')
         json_data = fd.read()
         fd.close()
-    except Exception, e:
+    except Exception as e:
         _logger.error('Could not read from %s: %s' % (path, e))
         return None
     try:
@@ -223,7 +223,7 @@ def get_email_from_training_data(path):
             data = json.loads(json_data)
         else:
             return None
-    except ValueError, e:
+    except ValueError as e:
         _logger.error('Cannot read training data: %s' % e)
         return None
     if 'email_address' in data:
@@ -237,7 +237,7 @@ def get_name_from_training_data(path):
         fd = open(path, 'r')
         json_data = fd.read()
         fd.close()
-    except Exception, e:
+    except Exception as e:
         _logger.error('Could not read from %s: %s' % (path, e))
         return None
     try:
@@ -245,7 +245,7 @@ def get_name_from_training_data(path):
             data = json.loads(json_data)
         else:
             return None
-    except ValueError, e:
+    except ValueError as e:
         _logger.error('Cannot read training data: %s' % e)
         return None
     if 'name' in data:
@@ -259,7 +259,7 @@ def get_completed_from_training_data(path):
         fd = open(path, 'r')
         json_data = fd.read()
         fd.close()
-    except Exception, e:
+    except Exception as e:
         _logger.error('Could not read from %s: %s' % (path, e))
         return None
     try:
@@ -267,7 +267,7 @@ def get_completed_from_training_data(path):
             data = json.loads(json_data)
         else:
             return None
-    except ValueError, e:
+    except ValueError as e:
         _logger.error('Cannot read training data: %s' % e)
         return None
     if 'completion_percentage' in data:
@@ -312,8 +312,11 @@ def unexpected_training_data_files(path, name):
 def is_full(path, required=_MINIMUM_SPACE):
     ''' Make sure we have some room to write our data '''
     volume_status = os.statvfs(path)
-    free_space = volume_status[statvfs.F_BSIZE] * \
-                 volume_status[statvfs.F_BAVAIL]
+    free_space = volume_status[os.statvfs.F_BSIZE] * \
+                 volume_status[os.statvfs.F_BAVAIL]
+
+
+
     _logger.debug('free space: %d MB' % int(free_space / (1024 * 1024)))
     if free_space < required:
         _logger.error('free space: %d MB' % int(free_space / (1024 * 1024)))
@@ -338,7 +341,7 @@ def is_landscape():
 
 
 def get_safe_text(text):
-    return urllib.pathname2url(text.encode('ascii', 'xmlcharrefreplace'))
+    return urllib.request.pathname2url(text.encode('ascii', 'xmlcharrefreplace'))
 
 
 def get_battery_level():
@@ -360,8 +363,8 @@ def get_battery_level():
 
 
 def get_sound_level():
-    client = GConf.Client.get_default()
-    return client.get_int('/desktop/sugar/sound/volume')
+    settings  = Gio.Settings('org.sugarlabs.sound') 
+    return settings.get_int('volume')
 
 
 def is_clipboard_text_available():
@@ -580,12 +583,12 @@ def get_sugarservices_version():
         bus = dbus.SessionBus()
         try:
             proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
-        except Exception, e:
+        except Exception as e:
             _logger.error('ERROR getting sugarservice service: %s' % e)
             return 0
     try:
         return dbus.Interface(proxy, _DBUS_SERVICE).GetVersion()
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR getting sugarservice version: %s' % e)
         return 0
 
@@ -600,7 +603,7 @@ def is_activity_open(bundle_name):
         return \
             dbus.Interface(proxy, _DBUS_SERVICE).GetActivityName() == \
             bundle_name and is_activity_view()
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR getting activity name %s' % e)
         return False
 
@@ -614,7 +617,7 @@ def is_journal_open():
     try:
         return dbus.Interface(proxy, _DBUS_SERVICE).IsJournal() and \
             is_activity_view()
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR getting zoom level %s' % e)
         return False
 
@@ -685,7 +688,7 @@ def goto_activity_view():
     try:
         dbus.Interface(proxy, _DBUS_SERVICE).SetZoomLevel(
             shell.ShellModel.ZOOM_ACTIVITY)
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR setting zoom level %s' % e)
 
 
@@ -701,7 +704,7 @@ def goto_journal():
                 shell.ShellModel.ZOOM_ACTIVITY)
         else:
             _logger.error('Could not find journal to open???')
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR calling open journal: %s' % e)
 
 
@@ -717,7 +720,7 @@ def set_journal_active():
                 shell.ShellModel.ZOOM_HOME)
         else:
             _logger.error('Could not find journal to open???')
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR calling open journal: %s' % e)
 
 
@@ -730,7 +733,7 @@ def goto_home_view():
     try:
         dbus.Interface(proxy, _DBUS_SERVICE).SetZoomLevel(
             shell.ShellModel.ZOOM_HOME)
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR setting zoom level %s' % e)
 
 
@@ -743,7 +746,7 @@ def goto_neighborhood_view():
     try:
         dbus.Interface(proxy, _DBUS_SERVICE).SetZoomLevel(
             shell.ShellModel.ZOOM_MESH)
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR setting zoom level %s' % e)
 
 
@@ -780,7 +783,7 @@ def get_last_launch_time(activity):
         launch_times = activity.metadata['launch-times'].split(',')
         try:
             return int(launch_times[-1])
-        except Exception, e:
+        except Exception as e:
             _logger.error('Malformed launch times found: %s' % e)
             return 0
     else:
@@ -796,8 +799,10 @@ def get_launch_count(activity):
 
 
 def get_colors():
-    client = GConf.Client.get_default()
-    return XoColor(client.get_string('/desktop/sugar/user/color'))
+
+
+    settings = Gio.Settings('org.sugarlabs.user') 
+    return XoColor(settings.get_string('color'))
 
 
 def get_nick():
@@ -907,8 +912,8 @@ def uitree_dump():
         proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
     try:
         return json.loads(dbus.Interface(proxy, _DBUS_SERVICE).Dump())
-    except Exception, e:
-        print ('ERROR calling Dump: %s' % e)
+    except Exception as e:
+        print(('ERROR calling Dump: %s' % e))
         # _logger.error('ERROR calling Dump: %s' % e)
     return ''
 
@@ -920,7 +925,7 @@ def get_uitree_node(name):
         proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
     try:
         return dbus.Interface(proxy, _DBUS_SERVICE).FindChild(name)
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR calling FindChild: %s' % e)
     return False
 
@@ -932,7 +937,7 @@ def click_uitree_node(name):
         proxy = bus.get_object(_DBUS_SERVICE, _DBUS_PATH)
     try:
         return dbus.Interface(proxy, _DBUS_SERVICE).Click(name)
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR calling Click: %s' % e)
     return False
 
@@ -1048,7 +1053,7 @@ def nm_status():
     try:
         status = dbus.Interface(proxy, _DBUS_SERVICE).NMStatus()
         logging.debug(status)
-    except Exception, e:
+    except Exception as e:
         _logger.error('ERROR getting NM Status: %s' % e)
         return None
 

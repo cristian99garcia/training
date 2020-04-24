@@ -1211,7 +1211,7 @@ class Connected7Task(HTMLTask):
         for button in self._buttons:
             button.set_sensitive(not button == widget)
         self._role = 'Other'
-        for key in _ROLES.keys():
+        for key in list(_ROLES.keys()):
             if _ROLES[key][0] == roll:
                 self._role = key
                 _logger.debug(self._role)
@@ -1239,7 +1239,7 @@ class Connected7Task(HTMLTask):
         self._buttons = graphics.add_list_buttons(roles)
         for i, button in enumerate(self._buttons):
             button.connect('clicked', self._role_button_callback, roles[i])
-            if self._role in _ROLES.keys() and \
+            if self._role in list(_ROLES.keys()) and \
                _ROLES[self._role][0] == roles[i]:
                 button.set_sensitive(False)
         if self._role == 'Other':
@@ -1852,7 +1852,7 @@ class Views5Task(HTMLTask):
             #               (self._name, len(utils.get_favorites().keys()),
             #                self._task_master.activity.favorites_count))
             # return len(utils.get_favorites().keys()) > task_data['data']
-            return len(utils.get_favorites().keys()) > \
+            return len(list(utils.get_favorites().keys())) > \
                    self._task_master.activity.favorites_count
 
 
@@ -1895,7 +1895,7 @@ class Views6Task(HTMLTask):
             #               (self._name, len(utils.get_favorites().keys()),
             #                self._task_master.activity.favorites_count))
             # return len(utils.get_favorites().keys()) < task_data['data']
-            return len(utils.get_favorites().keys()) < \
+            return len(list(utils.get_favorites().keys())) < \
                    self._task_master.activity.favorites_count
 
 class Views7Task(HTMLTask):
@@ -2697,7 +2697,7 @@ class Assessment1Task(HTMLTask):
         else:
             role = None
 
-        for key in _ROLES.keys():
+        for key in list(_ROLES.keys()):
             if key == role:
                 role = _ROLES[key][0]
                 self._yes_no_required = _ROLES[key][1]

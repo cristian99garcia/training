@@ -1,6 +1,6 @@
 [Activity]
 name = Sugar Labs Academy
-exec = sugar-activity activity.TrainingActivity
+exec = sugar-activity3 activity.TrainingActivity
 bundle_id = org.sugarlabs.Training
 icon = sugar-labs-academy
 activity_version = 3.6

@@ -673,7 +673,7 @@ class TaskMaster(Gtk.Alignment):
                 fd = open(usb_data_path, 'r')
                 json_data = fd.read()
                 fd.close()
-            except Exception, e:
+            except Exception as e:
                 # Maybe USB key has been pulled?
                 _logger.error('Could not read from %s: %s' %
                               (usb_data_path, e))
@@ -682,7 +682,7 @@ class TaskMaster(Gtk.Alignment):
             try:
                 if len(json_data) > 0:
                     data = json.loads(json_data)
-            except ValueError, e:
+            except ValueError as e:
                 _logger.error('Cannot read training data: %s' % e)
                 usb_read_failed = True
 
@@ -696,14 +696,14 @@ class TaskMaster(Gtk.Alignment):
                     fd = open(sugar_data_path, 'r')
                     json_data = fd.read()
                     fd.close()
-                except Exception, e:
+                except Exception as e:
                     json_data = ''
                     _logger.error('Could not read from %s: %s' %
                                   (sugar_data_path, e))
                 if len(json_data) > 0:
                     try:
                         data = json.loads(json_data)
-                    except ValueError, e:
+                    except ValueError as e:
                         _logger.error('Cannot load training data: %s' % e)
 
         if uid is None:
@@ -737,7 +737,7 @@ class TaskMaster(Gtk.Alignment):
                 fd = open(usb_data_path, 'r')
                 json_data = fd.read()
                 fd.close()
-            except Exception, e:
+            except Exception as e:
                 # Maybe USB key has been pulled?
                 _logger.error('Could not read from %s: %s' %
                               (usb_data_path, e))
@@ -746,7 +746,7 @@ class TaskMaster(Gtk.Alignment):
             if len(json_data) > 0:
                 try:
                     data = json.loads(json_data)
-                except ValueError, e:
+                except ValueError as e:
                     _logger.error('Cannot load training data: %s' % e)
                     usb_read_failed = True
 
@@ -757,7 +757,7 @@ class TaskMaster(Gtk.Alignment):
                     fd = open(sugar_data_path, 'r')
                     json_data = fd.read()
                     fd.close()
-                except Exception, e:
+                except Exception as e:
                     _logger.error('Could not read from %s: %s' %
                                   (sugar_data_path, e))
                     json_data = ''
@@ -765,7 +765,7 @@ class TaskMaster(Gtk.Alignment):
                 if len(json_data) > 0:
                     try:
                         data = json.loads(json_data)
-                    except ValueError, e:
+                    except ValueError as e:
                         _logger.error('Cannot load training data: %s' % e)
                         sugar_read_failed = True
 
@@ -787,7 +787,7 @@ class TaskMaster(Gtk.Alignment):
                 fd = open(usb_data_path, 'w')
                 fd.write(json_data)
                 fd.close()
-            except Exception, e:
+            except Exception as e:
                 _logger.error('Could not write to USB %s: %s' %
                               (usb_data_path, e))
                 _logger.error('write_task_data: Resync required')
@@ -802,7 +802,7 @@ class TaskMaster(Gtk.Alignment):
             if usb_read_failed:
                 _logger.error('write_task_data: Resync required')
                 self._resync_required = True
-        except Exception, e:
+        except Exception as e:
             _logger.error('Could not write to Sugar %s: %s' %
                           (sugar_data_path, e))
 
